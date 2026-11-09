@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mathe ganz leicht!</title>
+<style>
+  :root{
+    --ink:#2b2b2b; --soft:#5a6b60; --bg:#f4f7f4; --card:#ffffff;
+    --green:#5c8a5c; --green-soft:#e3efe3; --accent:#e8a13c; --accent-soft:#fdf3e3;
+    --blue:#4a7ba6; --blue-soft:#e7f0f7; --err:#c0564a; --err-soft:#faeae8;
+    --line:#dde5dd; --radius:16px;
+    --kidfont:'Comic Sans MS','Comic Neue','Segoe Print','Chalkboard SE',Verdana,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:var(--kidfont);background:var(--bg);color:var(--ink);line-height:1.55;font-size:17px}
+  .wrap{max-width:880px;margin:0 auto;padding:14px 16px 60px}
+  header.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:6px 0 10px}
+  h1{font-size:1.7rem;margin:0;color:var(--green)}
+  h1 .bang{color:var(--accent)}
+  .spacer{flex:1}
+  .langbar{display:flex;gap:6px;flex-wrap:wrap}
+  .langbtn,.zrbtn,.btn,.choice{
+    font-family:var(--kidfont);font-size:1rem;border:2px solid var(--line);
+    background:var(--card);color:var(--ink);border-radius:12px;padding:7px 12px;cursor:pointer;transition:.15s;
+  }
+  .langbtn[aria-pressed="true"],.zrbtn.sel,.choice.sel{border-color:var(--green);background:var(--green-soft);font-weight:bold}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:bold}
+  .btn.big{font-size:1.1rem;padding:10px 20px}
+  .btn:disabled{opacity:.45;cursor:default}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:14px 0;box-shadow:0 1px 3px rgba(40,60,40,.06)}
+  .pandarow{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+  .pandarow svg{width:74px;height:74px;flex:none}
+  .speech{background:var(--accent-soft);border:1px solid #eedbb8;border-radius:14px;padding:10px 14px;font-size:1.02rem;flex:1}
+  .homegrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:10px}
+  .catcard{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:16px;cursor:pointer;transition:.15s;text-align:start;width:100%}
+  .catcard:hover{border-color:var(--green);transform:translateY(-2px)}
+  .catcard .ic{font-size:1.6rem}
+  .catcard h3{margin:6px 0 6px;font-size:1.12rem;color:var(--green)}
+  .catcard p{margin:0;font-size:.92rem;color:var(--soft)}
+  .progress{height:10px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:10px}
+  .progress>div{height:100%;background:var(--green);border-radius:6px;transition:width .4s}
+  .topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
+  .topic{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:14px;cursor:pointer;transition:.15s;text-align:start;width:100%}
+  .topic:hover{border-color:var(--green)}
+  .topic h4{margin:0 0 6px;font-size:1.02rem;color:var(--ink)}
+  .topic p{margin:0;font-size:.88rem;color:var(--soft)}
+  .stars{color:var(--accent);letter-spacing:2px;white-space:nowrap}
+  .exlist{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+  .exitem{display:flex;align-items:center;gap:12px;background:var(--card);border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;text-align:start;width:100%}
+  .exitem:hover{border-color:var(--green)}
+  .exitem .exname{font-weight:bold}
+  .exitem .exdesc{font-size:.85rem;color:var(--soft)}
+  .exitem .spacer{flex:1}
+  .taskcard h2{margin:0 0 4px;font-size:1.25rem;color:var(--blue)}
+  .instr{color:var(--soft);font-size:.95rem;margin:0 0 14px}
+  .qline{font-size:1.35rem;margin:14px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;direction:ltr}
+  .qline input{
+    font-family:var(--kidfont);font-size:1.3rem;width:110px;text-align:center;
+    border:none;border-bottom:3px solid var(--green);background:var(--green-soft);border-radius:8px 8px 0 0;padding:6px;
+  }
+  .qline input.small{width:70px}
+  .qline input:focus{outline:2px solid var(--accent);background:#fff}
+  .choices{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;direction:ltr}
+  .choice{font-size:1.15rem;min-width:74px}
+  .choices.ops .choice{font-size:1.5rem;font-weight:bold}
+  .feedback{border-radius:12px;padding:12px 14px;margin:12px 0;display:none;font-size:1.02rem}
+  .feedback.ok{display:block;background:var(--green-soft);border:1px solid #bcd8bc}
+  .feedback.err{display:block;background:var(--err-soft);border:1px solid #e5c0ba}
+  .feedback .steps{margin:6px 0 0;padding-inline-start:18px;font-size:.98rem;direction:ltr}
+  .mathword{background:var(--blue-soft);border-radius:10px;padding:8px 12px;font-size:1.25rem;letter-spacing:1px;font-weight:bold;direction:ltr;display:inline-block}
+  .navrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+  .sessionmeta{color:var(--soft);font-size:.9rem}
+  .dottrack{display:flex;gap:5px;margin-inline-start:auto}
+  .dot{width:12px;height:12px;border-radius:50%;background:var(--line)}
+  .dot.ok{background:var(--green)}.dot.half{background:var(--accent)}.dot.bad{background:var(--err)}
+  .footer{color:var(--soft);font-size:.8rem;margin-top:26px;border-top:1px solid var(--line);padding-top:12px}
+  .roundend{text-align:center}
+  .bigstars{font-size:2.2rem;letter-spacing:4px;color:var(--accent);margin:8px 0}
+  .zrpicker{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+  .hearts{display:flex;gap:6px;flex-wrap:wrap;direction:ltr;margin-top:8px}
+  @media (max-width:520px){body{font-size:16px}.qline{font-size:1.2rem}.pandarow svg{width:60px;height:60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <svg id="pandaTop" viewBox="0 0 100 100" width="52" height="52" aria-hidden="true"></svg>
+    <h1 id="title">Mathe ganz leicht<span class="bang">!</span></h1>
+    <div class="spacer"></div>
+    <div class="langbar" id="langbar"></div>
+  </header>
+  <main id="app"></main>
+  <div class="footer" id="footer"></div>
+</div>
+
+<script>
+/* ============================================================
+   Mathe ganz leicht! – Übungswebseite für Kinder mit
+   Rechenschwierigkeiten (Klasse 3–6).
+   Aufgabentypen in Anlehnung an FÖDIMA-Kartei 1/2 und 3/4
+   (PIKAS/DZLM, CC BY-NC-SA 4.0) und den Förderplan von
+   S. Szendeleit (SIBUZ Marzahn-Hellersdorf) – eigene Umsetzung.
+   Alle Aufgaben werden endlos neu generiert und automatisch geprüft.
+   ============================================================ */
+
+/* ---------- Panda-Maskottchen (SVG) ---------- */
+function pandaSVG(mood){
+  const mouth = mood==='happy'
+    ? '<path d="M40 68 Q50 78 60 68" stroke="#37413a" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    : mood==='sad'
+    ? '<path d="M42 73 Q50 66 58 73" stroke="#37413a" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    : '<path d="M42 71 Q50 74 58 71" stroke="#37413a" stroke-width="3" fill="none" stroke-linecap="round"/>';
+  return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Panda Pandi">'
+    +'<ellipse cx="50" cy="90" rx="24" ry="6" fill="#dde5dd"/>'
+    +'<circle cx="24" cy="26" r="14" fill="#37413a"/><circle cx="76" cy="26" r="14" fill="#37413a"/>'
+    +'<circle cx="50" cy="55" r="34" fill="#fff" stroke="#37413a" stroke-width="3"/>'
+    +'<ellipse cx="34" cy="42" rx="9" ry="11" fill="#37413a" transform="rotate(-18 34 42)"/>'
+    +'<ellipse cx="66" cy="42" rx="9" ry="11" fill="#37413a" transform="rotate(18 66 42)"/>'
+    +'<circle cx="38" cy="45" r="3.4" fill="#fff"/><circle cx="62" cy="45" r="3.4" fill="#fff"/>'
+    +'<ellipse cx="50" cy="58" rx="9" ry="7" fill="#37413a"/>'+mouth+'</svg>';
+}
+
+/* ---------- Übersetzungen ---------- */
+const NUM = {
+  de:{20:"bis 20",100:"bis 100",1000:"bis 1 000",10000:"bis 10 000",1000000:"bis 1 000 000"},
+  vi:{20:"đến 20",100:"đến 100",1000:"đến 1 000",10000:"đến 10 000",1000000:"đến 1 000 000"},
+  ru:{20:"до 20",100:"до 100",1000:"до 1 000",10000:"до 10 000",1000000:"до 1 000 000"},
+  ar:{20:"إلى 20",100:"إلى 100",1000:"إلى 1000",10000:"إلى 10 000",1000000:"إلى 1 000 000"}
+};
+const T = {
+de: {
+  welcome:"Schön, dass du da bist! Ich bin Pandi. Wähle zuerst deinen Zahlenraum – dann üben wir los!",
+  chooseCat:"Was möchtest du üben?",
+  back:"Zurück", home:"Start", check:"Prüfen", next:"Weiter", retry:"Nochmal üben",
+  zrLabel:"Zahlenraum:", points:"Punkte",
+  task:"Aufgabe", of:"von", finished:"Fertig! Du hast alle Aufgaben geschafft!",
+  cat1:"Stellenwert", cat1d:"Zahlen verstehen: zählen, darstellen, bündeln und Stellenwerte entdecken",
+  cat2:"Rechenoperationen", cat2d:"Verstehen, was Plus, Minus, Mal und Geteilt bedeuten",
+  cat3:"Zählendes Rechnen überwinden", cat3d:"Mit schlauen Rechenstrategien schneller und sicherer werden",
+  t_count:"Zählen und Zahlenreihen", t_count_d:"Zahlenfolgen entdecken und weiterzählen",
+  t_repr:"Zahlen darstellen und erfassen", t_repr_d:"Plättchen, Felder und Zahlen einander zuordnen",
+  t_pv:"Stellenwerte und Bündeln", t_pv_d:"Hunderter, Zehner und Einer verstehen",
+  t_story:"Rechengeschichten", t_story_d:"Geschichten in Rechenaufgaben übersetzen",
+  t_fam:"Aufgabenzusammenhänge", t_fam_d:"Tauschaufgaben, Umkehraufgaben und Nachbaraufgaben",
+  t_strat:"Rechenstrategien", t_strat_d:"Verdoppeln, Halbieren und geschickt über Zehner und Hunderter rechnen",
+  t_auto:"Grundaufgaben automatisieren", t_auto_d:"Rechpäckchen und ein Worträtsel",
+  ex_seq:"Zahlenreihe", ex_seq_d:"Welche Zahlen fehlen? Finde die Schrittweite!",
+  ex_line:"Zahlenstrahl", ex_line_d:"Wo liegt die Zahl? Tippe auf den Zahlenstrahl!",
+  ex_dots:"Zahl erfassen", ex_dots_d:"Wie viele Plättchen siehst du? Schnell erfassen!",
+  ex_pv:"Stellenwerte", ex_pv_d:"Wie viele Hunderter, Zehner, Einer?",
+  ex_bund:"Bündeln und Entbündeln", ex_bund_d:"Zehner und Einer austauschen",
+  ex_story:"Rechengeschichte", ex_story_d:"Erst die Rechenart wählen, dann ausrechnen",
+  ex_fam:"Tausch- und Umkehraufgabe", ex_fam_d:"Nutze die Aufgabe, die du schon kennst!",
+  ex_dbl:"Verdoppeln und Halbieren", ex_dbl_d:"Das Doppelte und die Hälfte",
+  ex_ten:"Über den Zehner", ex_ten_d:"Erst zur Zehner- oder Hunderterzahl, dann den Rest!",
+  ex_pack:"Rechpäckchen", ex_pack_d:"Aufgaben in einer Reihe hängen zusammen",
+  ex_word:"Worträtsel", ex_word_d:"Löse Aufgaben und sammle Buchstaben!",
+  correct:["Super gemacht!","Genau richtig!","Klasse! Du kannst das!","Stark gerechnet!","Perfekt!"],
+  almost:"Fast! Schau noch einmal genau hin.",
+  wrong:"Das stimmt noch nicht ganz. Hier ist ein Tipp von Pandi:",
+  wrong2:"Kein Problem! Pandi zeigt dir den Rechenweg:",
+  hint_digits:"Achtung: Prüfe noch einmal die {place}!",
+  sol:"So geht's:",
+  sel_op:"Welche Rechenart passt zur Geschichte?",
+  ex_seq_i:"Trage die fehlenden Zahlen ein. Tipp: Finde zuerst die Schrittweite!",
+  ex_line_i:"Wo liegt die Zahl {n}? Tippe auf die richtige Stelle am Zahlenstrahl.",
+  ex_line_hint:"Die Zahl {n} liegt zwischen {a} und {b}. Versuche es noch einmal!",
+  ex_dots_i:"Wie viele Plättchen sind das? Schreibe die Zahl.",
+  ex_dots_hint:"Tipp: Erfasse zuerst die großen Bündel ({big}), dann die kleinen ({small})!",
+  ex_pv_i:"Wie viele {place} hat die Zahl {n}?",
+  ex_fam_i:"Nutze die Aufgabe oben – du kennst die Zahlen schon!",
+  ex_ten_i:"Rechne geschickt: Erst bis zur nächsten {round}, dann den Rest dazu oder weg!",
+  ex_pack_i:"Die Aufgaben in der Reihe hängen zusammen – nutze die Rechenwege der Aufgaben darüber!",
+  ex_word_i:"Löse die Aufgaben. Für jede richtige Lösung bekommst du einen Buchstaben.",
+  ex_word_pick:"Welches Wort ergibt die Lösung?",
+  hint_tausch:"Tipp: Bei der Tauschaufgabe werden nur die beiden Zahlen vor dem Plus getauscht – das Ergebnis bleibt gleich!",
+  hint_umkehr:"Tipp: Die Umkehraufgabe nimmt die Addition wieder zurück: Vom Ergebnis wird das zweite Plus-Zahl weggenommen.",
+  hint_gegen:"Tipp: Gegensinnig verändern – die eine Zahl wächst, die andere schrumpft genauso. Das Ergebnis bleibt gleich!",
+  hint_dbl:"Tipp: Doppelt so groß heißt: die Zahl plus sich selbst.",
+  hint_half:"Tipp: Suche die Zahl, die man verdoppeln muss, um {n} zu erhalten.",
+  hint_plus:"Tipp: Etwas kommt dazu – das ist ein Plus-Vorgang.",
+  hint_minus:"Tipp: Etwas wird weggenommen – das ist ein Minus-Vorgang.",
+  hint_mal:"Tipp: Gleiche Gruppen mehrmals – das ist Mal-Rechnen.",
+  hint_div:"Tipp: Gerecht verteilen – das ist Teilen (Dividieren).",
+  words:["SUMME","PANDA","RECHNE","ZEHN","ZAHL"],
+  story_plus:"Pandi sammelt {a} Bambusstangen. Am Nachmittag findet er noch {b} weitere. Wie viele Bambusstangen hat Pandi jetzt?",
+  story_minus:"Pandi hat {a} Bambusstangen. Er isst {b} davon auf. Wie viele Bambusstangen bleiben übrig?",
+  story_mult:"Im Bambuswald sitzen {a} Pandagruppen. Jede Gruppe frisst {b} Bambusstangen. Wie viele Bambusstangen fressen die Gruppen zusammen?",
+  story_div:"Pandi verteilt {a} Bambusstangen gerecht auf {b} Pandas. Wie viele Stangen bekommt jeder Panda?",
+  credits:"Konzipiert nach dem Förderplan für Kinder mit Rechenschwierigkeiten (S. Szendeleit, SIBUZ Marzahn-Hellersdorf). Aufgabentypen in Anlehnung an die FÖDIMA-Kartei (PIKAS/DZLM, Lizenz CC BY-NC-SA 4.0) – eigene, neu gestaltete Umsetzung. Alle Aufgaben werden automatisch neu erzeugt und automatisch geprüft."
+},
+vi: {
+  welcome:"Rất vui bạn đến đây! Mình là Pandi. Hãy chọn khoảng số trước – rồi chúng ta cùng luyện tập!",
+  chooseCat:"Bạn muốn luyện tập điều gì?",
+  back:"Quay lại", home:"Trang chủ", check:"Kiểm tra", next:"Tiếp theo", retry:"Luyện lại",
+  zrLabel:"Khoảng số:", points:"Điểm",
+  task:"Bài", of:"trên", finished:"Xong! Bạn đã hoàn thành tất cả các bài!",
+  cat1:"Giá trị hàng", cat1d:"Hiểu số: đếm, biểu diễn, bó và nhận biết giá trị hàng",
+  cat2:"Phép tính", cat2d:"Hiểu cộng, trừ, nhân, chia nghĩa là gì",
+  cat3:"Vượt qua đếm từng bước", cat3d:"Tính nhanh và chắc chắn hơn với chiến lược thông minh",
+  t_count:"Đếm và dãy số", t_count_d:"Tìm quy luật và đếm tiếp",
+  t_repr:"Biểu diễn số", t_repr_d:"Ghép hình chấm, bảng và số với nhau",
+  t_pv:"Giá trị hàng và bó", t_pv_d:"Hiểu trăm, chục và đơn vị",
+  t_story:"Toán có chuyện", t_story_d:"Chuyển chuyện thành phép tính",
+  t_fam:"Quan hệ giữa các bài", t_fam_d:"Đổi vị trí, phép ngược và bài hàng xóm",
+  t_strat:"Chiến lược tính", t_strat_d:"Nhân đôi, chia đôi và tính khéo qua số tròn",
+  t_auto:"Tính thành thạo", t_auto_d:"Chuỗi bài và ô chữ",
+  ex_seq:"Dãy số", ex_seq_d:"Số nào bị thiếu? Tìm bước nhảy!",
+  ex_line:"Tia số", ex_line_d:"Số nằm ở đâu? Chạm vào tia số!",
+  ex_dots:"Nhận biết số lượng", ex_dots_d:"Bạn thấy bao nhiêu ô? Nhìn nhanh nhé!",
+  ex_pv:"Giá trị hàng", ex_pv_d:"Bao nhiêu trăm, chục, đơn vị?",
+  ex_bund:"Bó và tách bó", ex_bund_d:"Đổi chục và đơn vị",
+  ex_story:"Toán có chuyện", ex_story_d:"Chọn phép tính rồi tính kết quả",
+  ex_fam:"Đổi và ngược lại", ex_fam_d:"Dùng bài bạn đã biết!",
+  ex_dbl:"Nhân đôi và chia đôi", ex_dbl_d:"Gấp đôi và một nửa",
+  ex_ten:"Qua số tròn", ex_ten_d:"Đến số tròn trước, rồi cộng/bớt phần còn lại!",
+  ex_pack:"Chuỗi phép tính", ex_pack_d:"Các bài trong một hàng có liên quan với nhau",
+  ex_word:"Ô chữ", ex_word_d:"Giải bài và thu chữ cái!",
+  correct:["Tuyệt vời!","Chính xác!","Giỏi lắm!","Bạn tính cừ khôi!","Hoàn hảo!"],
+  almost:"Gần đúng rồi! Nhìn kỹ lại nhé.",
+  wrong:"Chưa đúng lắm. Pandi gợi ý nhé:",
+  wrong2:"Không sao! Pandi chỉ bạn cách tính:",
+  hint_digits:"Cẩn thận: kiểm tra lại {place}!",
+  sol:"Cách tính:",
+  sel_op:"Phép tính nào phù hợp với câu chuyện?",
+  ex_seq_i:"Điền các số còn thiếu. Mẹo: tìm bước nhảy trước!",
+  ex_line_i:"Số {n} nằm ở đâu? Chạm vào đúng chỗ trên tia số.",
+  ex_line_hint:"Số {n} nằm giữa {a} và {b}. Thử lại nhé!",
+  ex_dots_i:"Có bao nhiêu ô? Hãy viết số.",
+  ex_dots_hint:"Mẹo: Đếm các bó lớn ({big}) trước, rồi đến các bó nhỏ ({small})!",
+  ex_pv_i:"Số {n} có bao nhiêu {place}?",
+  ex_fam_i:"Dùng bài ở trên – bạn đã biết các số rồi!",
+  ex_ten_i:"Tính khéo: tới số tròn ({round}) trước, rồi cộng/bớt phần còn lại!",
+  ex_pack_i:"Các bài trong hàng liên quan với nhau – dùng cách tính của các bài phía trên!",
+  ex_word_i:"Giải các bài. Mỗi bài đúng cho bạn một chữ cái.",
+  ex_word_pick:"Từ nào được tạo nên?",
+  hint_tausch:"Mẹo: Trong phép đổi vị trí, chỉ đổi hai số trước dấu cộng – kết quả vẫn thế!",
+  hint_umkehr:"Mẹo: Phép ngược lấy lại phép cộng: lấy kết quả trừ đi số cộng thứ hai.",
+  hint_gegen:"Mẹo: Thay đổi ngược chiều – một số tăng, số kia giảm đúng bằng đó. Kết quả vẫn thế!",
+  hint_dbl:"Mẹo: Gấp đôi nghĩa là: số đó cộng với chính nó.",
+  hint_half:"Mẹo: Tìm số mà nhân đôi lên thì được {n}.",
+  hint_plus:"Mẹo: Có thêm nữa – đó là phép cộng.",
+  hint_minus:"Mẹo: Bị lấy bớt đi – đó là phép trừ.",
+  hint_mal:"Mẹo: Nhiều nhóm như nhau – đó là phép nhân.",
+  hint_div:"Mẹo: Chia đều – đó là phép chia.",
+  words:["CỘNG","TỔNG","SỐ","MƯỜI","PANDA"],
+  story_plus:"Pandi hái được {a} cây tre. Buổi chiều cậu tìm thêm {b} cây nữa. Bây giờ Pandi có bao nhiêu cây tre?",
+  story_minus:"Pandi có {a} cây tre. Cậu ăn mất {b} cây. Còn lại bao nhiêu cây tre?",
+  story_mult:"Trong rừng tre có {a} nhóm gấu trúc. Mỗi nhóm ăn {b} cây tre. Các nhóm ăn bao nhiêu cây tre tất cả?",
+  story_div:"Pandi chia đều {a} cây tre cho {b} chú gấu trúc. Mỗi chú được bao nhiêu cây?",
+  credits:"Thiết kế theo kế hoạch hỗ trợ trẻ khó khăn về toán (S. Szendeleit, SIBUZ Marzahn-Hellersdorf). Dạng bài phỏng theo bộ thẻ FÖDIMA (PIKAS/DZLM, giấy phép CC BY-NC-SA 4.0) – cách trình bày riêng. Mọi bài được tạo và kiểm tra tự động."
+},
+ru: {
+  welcome:"Как хорошо, что ты пришёл! Я — Панди. Сначала выбери числовой промежуток — и начнём тренироваться!",
+  chooseCat:"Что хочешь потренировать?",
+  back:"Назад", home:"Начало", check:"Проверить", next:"Дальше", retry:"Ещё раз",
+  zrLabel:"Числовой промежуток:", points:"Очки",
+  task:"Задание", of:"из", finished:"Готово! Ты выполнил все задания!",
+  cat1:"Разряды чисел", cat1d:"Понимать числа: считать, представлять, объединять и находить разряды",
+  cat2:"Арифметические действия", cat2d:"Понимать, что означают плюс, минус, умножение и деление",
+  cat3:"Считаем без счёта на пальцах", cat3d:"Считаем быстрее и увереннее с умными стратегиями",
+  t_count:"Счёт и ряды чисел", t_count_d:"Находить закономерности и продолжать счёт",
+  t_repr:"Представление чисел", t_repr_d:"Соединять точки, поля и числа",
+  t_pv:"Разряды и пучки", t_pv_d:"Понимать сотни, десятки и единицы",
+  t_story:"Задачи-истории", t_story_d:"Переводить истории в примеры",
+  t_fam:"Связи между примерами", t_fam_d:"Перестановка, обратные и соседние примеры",
+  t_strat:"Стратегии вычислений", t_strat_d:"Удвоение, деление пополам и переход через круглые числа",
+  t_auto:"Автоматизируем счёт", t_auto_d:"Столбики примеров и буквенная загадка",
+  ex_seq:"Ряд чисел", ex_seq_d:"Каких чисел не хватает? Найди шаг!",
+  ex_line:"Числовая прямая", ex_line_d:"Где находится число? Нажми на прямой!",
+  ex_dots:"Узнай количество", ex_dots_d:"Сколько точек ты видишь? Смотри быстро!",
+  ex_pv:"Разряды", ex_pv_d:"Сколько сотен, десятков, единиц?",
+  ex_bund:"Пучки и размен", ex_bund_d:"Менять десятки и единицы",
+  ex_story:"Задача-история", ex_story_d:"Сначала выбери действие, потом посчитай",
+  ex_fam:"Перестановка и обратный пример", ex_fam_d:"Используй пример, который уже знаешь!",
+  ex_dbl:"Удвоение и деление пополам", ex_dbl_d:"Двойное и половина",
+  ex_ten:"Через круглое число", ex_ten_d:"Сначала до круглого числа, потом остаток!",
+  ex_pack:"Столбик примеров", ex_pack_d:"Примеры в ряду связаны друг с другом",
+  ex_word:"Словесная загадка", ex_word_d:"Решай примеры и собирай буквы!",
+  correct:["Отлично!","Верно!","Молодец!","Здорово посчитал!","Идеально!"],
+  almost:"Почти! Посмотри ещё раз внимательно.",
+  wrong:"Пока не совсем. Вот подсказка от Панди:",
+  wrong2:"Ничего страшного! Панди покажет путь решения:",
+  hint_digits:"Внимание: проверь ещё раз {place}!",
+  sol:"Решение:",
+  sel_op:"Какое действие подходит к истории?",
+  ex_seq_i:"Впиши пропущенные числа. Совет: сначала найди шаг!",
+  ex_line_i:"Где находится число {n}? Нажми на правильное место на прямой.",
+  ex_line_hint:"Число {n} находится между {a} и {b}. Попробуй ещё раз!",
+  ex_dots_i:"Сколько здесь точек? Запиши число.",
+  ex_dots_hint:"Совет: сначала посчитай большие пучки ({big}), потом маленькие ({small})!",
+  ex_pv_i:"Сколько {place} в числе {n}?",
+  ex_fam_i:"Используй пример выше — числа тебе уже знакомы!",
+  ex_ten_i:"Считай хитро: сначала до ближайшего круглого числа ({round}), потом остаток!",
+  ex_pack_i:"Примеры в ряду связаны — используй решения примеров выше!",
+  ex_word_i:"Решай примеры. За каждый правильный ответ — буква.",
+  ex_word_pick:"Какое слово получилось?",
+  hint_tausch:"Совет: при перестановке меняются только числа до знака плюс – сумма не меняется!",
+  hint_umkehr:"Совет: обратный пример возвращает сложение: из суммы вычитаем второе слагаемое.",
+  hint_gegen:"Совет: изменение в противоположные стороны – одно число растёт, другое уменьшается так же. Сумма та же!",
+  hint_dbl:"Совет: удвоить – значит прибавить число к самому себе.",
+  hint_half:"Совет: найди число, которое при удвоении даёт {n}.",
+  hint_plus:"Совет: что-то добавляется – это сложение.",
+  hint_minus:"Совет: что-то забирают – это вычитание.",
+  hint_mal:"Совет: одинаковые группы повторяются – это умножение.",
+  hint_div:"Совет: делим поровну – это деление.",
+  words:["СУММА","ЧИСЛО","ПЛЮС","ДЕСЯТЬ","ПАНДА"],
+  story_plus:"Панди собрал {a} стеблей бамбука. После обеда он нашёл ещё {b}. Сколько стеблей бамбука у Панди теперь?",
+  story_minus:"У Панди {a} стеблей бамбука. Он съел {b} из них. Сколько стеблей осталось?",
+  story_mult:"В бамбуковом лесу {a} групп панд. Каждая группа съедает {b} стеблей бамбука. Сколько стеблей съедают все вместе?",
+  story_div:"Панди делит {a} стеблей бамбука поровну между {b} пандами. Сколько стеблей получит каждая панда?",
+  credits:"Разработано по плану помощи детям с трудностями в счёте (S. Szendeleit, SIBUZ Marzahn-Hellersdorf). Типы заданий по мотивам картотеки FÖDIMA (PIKAS/DZLM, лицензия CC BY-NC-SA 4.0) — собственное оформление. Все задания создаются и проверяются автоматически."
+},
+ar: {
+  welcome:"كم أنا سعيد بوجودك! أنا باندي. اختر المدى العددي أولاً – ثم نبدأ التدريب!",
+  chooseCat:"ماذا تريد أن تتدرب عليه؟",
+  back:"رجوع", home:"البداية", check:"تحقق", next:"التالي", retry:"تدريب مرة أخرى",
+  zrLabel:"المدى العددي:", points:"نقاط",
+  task:"مهمة", of:"من", finished:"أكملت جميع المهام!",
+  cat1:"القيمة المنزلية", cat1d:"فهم الأعداد: العدّ والتمثيل والتحزيم ومعرفة المنازل",
+  cat2:"العمليات الحسابية", cat2d:"فهم معنى الجمع والطرح والضرب والقسمة",
+  cat3:"التغلب على العدّ بالأصابع", cat3d:"نحسب أسرع وأدق باستخدام استراتيجيات ذكية",
+  t_count:"العدّ وسلاسل الأعداد", t_count_d:"اكتشف النمط وأكمل العدّ",
+  t_repr:"تمثيل الأعداد", t_repr_d:"طابق بين النقاط والحقول والأعداد",
+  t_pv:"المنازل والتحزيم", t_pv_d:"افهم المئات والعشرات والآحاد",
+  t_story:"مسائل من قصة", t_story_d:"حوّل القصة إلى عملية حسابية",
+  t_fam:"روابط بين المسائل", t_fam_d:"التبديل وعكس العملية والمسائل المجاورة",
+  t_strat:"استراتيجيات الحساب", t_strat_d:"المضاعفة والتنصيف والمرور على العدد الدائري",
+  t_auto:"إتقان الحساب", t_auto_d:"سلاسل مسائل ولغز كلمات",
+  ex_seq:"سلسلة أعداد", ex_seq_d:"أي عدد ناقص؟ اكتشف خطوة العدّ!",
+  ex_line:"خط الأعداد", ex_line_d:"أين يقع العدد؟ انقر على خط الأعداد!",
+  ex_dots:"إدراك الكمية", ex_dots_d:"كم نقطة ترى؟ انظر بسرعة!",
+  ex_pv:"المنازل", ex_pv_d:"كم مئة وكم عشرة وكم واحد؟",
+  ex_bund:"التحزيم وفك الحزم", ex_bund_d:"بدّل العشرات والآحاد",
+  ex_story:"مسألة من قصة", ex_story_d:"اختر العملية ثم احسب النتيجة",
+  ex_fam:"التبديل والعكس", ex_fam_d:"استعمل المسألة التي تعرفها!",
+  ex_dbl:"المضاعفة والتنصيف", ex_dbl_d:"الضعف والنصف",
+  ex_ten:"المرور على العدد الدائري", ex_ten_d:"أولاً إلى العدد الدائري، ثم الباقي!",
+  ex_pack:"سلسلة مسائل", ex_pack_d:"المسائل في السلسلة مترابطة",
+  ex_word:"لغز الكلمات", ex_word_d:"حلّ المسائل واجمع الحروف!",
+  correct:["رائع!","إجابة صحيحة!","أحسنت!","حساب ممتاز!","ممتاز!"],
+  almost:"قريب جداً! انظر مرة أخرى بتمعّن.",
+  wrong:"ليست صحيحة تماماً بعد. إليك تلميح من باندي:",
+  wrong2:"لا بأس! سيريك باندي طريقة الحل:",
+  hint_digits:"انتبه: تحقق من {place} مرة أخرى!",
+  sol:"الحل:",
+  sel_op:"أي عملية تناسب القصة؟",
+  ex_seq_i:"أكمل الأعداد الناقصة. نصيحة: اكتشف خطوة العدّ أولاً!",
+  ex_line_i:"أين يقع العدد {n}؟ انقر على المكان الصحيح على خط الأعداد.",
+  ex_line_hint:"العدد {n} يقع بين {a} و{b}. حاول مرة أخرى!",
+  ex_dots_i:"كم نقطة هناك؟ اكتب العدد.",
+  ex_dots_hint:"نصيحة: عدّ الحزم الكبيرة ({big}) أولاً، ثم الصغيرة ({small})!",
+  ex_pv_i:"كم {place} في العدد {n}؟",
+  ex_fam_i:"استعمل المسألة أعلاه – أنت تعرف الأعداد بالفعل!",
+  ex_ten_i:"احسب بذكاء: أولاً إلى العدد الدائري ({round})، ثم الباقي!",
+  ex_pack_i:"المسائل في السلسلة مترابطة – استفد من حلول المسائل أعلاه!",
+  ex_word_i:"حلّ المسائل. كل إجابة صحيحة تعطيك حرفاً.",
+  ex_word_pick:"أي كلمة تكوّنت؟",
+  hint_tausch:"تلميح: في التبديل يتبدل الرقمان قبل علامة الجمع فقط – والناتج يبقى نفسه!",
+  hint_umkehr:"تلميح: المسألة العكسية تُرجع عملية الجمع: اطرح العدد الثاني المُضاف من الناتج.",
+  hint_gegen:"تلميح: تغيّر متعاكس – عدد يزيد والآخر ينقص بالمقدار نفسه. الناتج يبقى نفسه!",
+  hint_dbl:"تلميح: المضاعفة تعني جمع العدد مع نفسه.",
+  hint_half:"تلميح: ابحث عن العدد الذي عند مضاعفته يعطي {n}.",
+  hint_plus:"تلميح: شيء يُضاف – هذه عملية جمع.",
+  hint_minus:"تلميح: شيء يُؤخذ – هذه عملية طرح.",
+  hint_mal:"تلميح: مجموعات متساوية تتكرر – هذه عملية ضرب.",
+  hint_div:"تلميح: قسمة بالتساوي – هذه عملية قسمة.",
+  words:["مجموع","عدد","جمع","عشرة","باندا"],
+  story_plus:"جمع باندي {a} أعواد خيزران. بعد الظهر وجد {b} عوداً إضافياً. كم عوداً صار مع باندي الآن؟",
+  story_minus:"مع باندي {a} عود خيزران. أكل {b} منها. كم عوداً بقي؟",
+  story_mult:"في غابة الخيزران {a} مجموعات من الباندا. كل مجموعة تأكل {b} أعواد. كم عوداً تأكل جميعاً؟",
+  story_div:"وزّع باندي {a} أعواد خيزران بالتساوي على {b} من الباندا. كم عوداً يأخذ كل باندا؟",
+  credits:"صُمم وفق خطة الدعم للأطفال ذوي صعوبات الحساب (S. Szendeleit, SIBUZ Marzahn-Hellersdorf). أنواع المهام مستوحاة من بطاقات FÖDIMA (PIKAS/DZLM، رخصة CC BY-NC-SA 4.0) – تصميم مستقل. تُنشأ جميع المهام وتُفحص تلقائياً."
+}
+};
+/* Plural-Namen für Stellenwerte */
+const PLURAL = {
+  de:{h:"Hunderter",z:"Zehner",e:"Einer",z10:"Zehntausender"},
+  vi:{h:"trăm",z:"chục",e:"đơn vị",z10:"nghìn"},
+  ru:{h:"сотен",z:"десятков",e:"единиц",z10:"десятков тысяч"},
+  ar:{h:"مئات",z:"عشرات",e:"آحاد",z10:"عشرات آلاف"}
+};
+const LANGS=[["de","Deutsch"],["vi","Tiếng Việt"],["ru","Русский"],["ar","العربية"]];
+const ZR_KEYS=[20,100,1000,10000,1000000];
+
+/* ---------- Zustand ---------- */
+let S={
+  lang: (typeof localStorage!=='undefined'?localStorage.getItem('mgl_lang'):'') ||'de',
+  zr: parseInt((typeof localStorage!=='undefined'?localStorage.getItem('mgl_zr'):'')||'100',10),
+  view:'home', cat:null, topic:null,
+  progress: (typeof localStorage!=='undefined'&&localStorage.getItem('mgl_progress'))?JSON.parse(localStorage.getItem('mgl_progress')):{}
+};
+function saveState(){ if(typeof localStorage==='undefined')return; localStorage.setItem('mgl_lang',S.lang); localStorage.setItem('mgl_zr',String(S.zr)); localStorage.setItem('mgl_progress',JSON.stringify(S.progress)); }
+function t(key,params){
+  let v=T[S.lang][key];
+  if(typeof v!=='string') return v;
+  if(params) for(const k in params) v=v.split('{'+k+'}').join(params[k]);
+  return v;
+}
+function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f'); }
+function pw(pl){ return PLURAL[S.lang][pl]; }
+
+/* ---------- Helfer ---------- */
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+function shuffled(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function digitsOf(n){const d=[];let x=n;while(x>0){d.push(x%10);x=Math.floor(x/10);}return d.length?d:[0];}
+function placeOf(n,pl){const d=digitsOf(n);if(pl==='e')return d[0]||0;if(pl==='z')return d[1]||0;if(pl==='h')return d[2]||0;if(pl==='z10')return d[3]||0;return 0;}
+function nearestRoundAbove(n,u){return Math.floor(n/u)*u+u;}
+function roundBelow(n,u){return Math.floor(n/u)*u;}
+function tenUnit(){ if(S.zr<=100)return 10; if(S.zr<=1000)return 100; if(S.zr<=10000)return 1000; return 10000; }
+function roundWord(){const u=tenUnit();
+  if(S.lang==='de')return u===10?'Zehnerzahl':u===100?'Hunderterzahl':u===1000?'Tausenderzahl':'Zehntausenderzahl';
+  if(S.lang==='ru')return u===10?'круглого десятка':u===100?'круглой сотни':u===1000?'круглой тысячи':'круглого числа';
+  if(S.lang==='vi')return u===10?'số tròn chục':u===100?'số tròn trăm':u===1000?'số tròn nghìn':'số tròn';
+  return u===10?'العدد الدائري للعشرات':u===100?'العدد الدائري للمئات':u===1000?'العدد الدائري للآلاف':'العدد الدائري';
+}
+function countText(h,z,e){
+  const n=h*100+z*10+e;
+  const parts=[];
+  if(h>0)parts.push(h+' '+pw('h'));
+  if(z>0)parts.push(z+' '+pw('z'));
+  parts.push(e+' '+pw('e'));
+  if(S.lang==='ar')return parts.join(' و ')+' = '+fmt(n);
+  const joiner=S.lang==='de'?' und ':S.lang==='ru'?' и ':' và ';
+  return parts.slice(0,-1).join(', ')+joiner+parts[parts.length-1]+' = '+fmt(n);
+}
+
+/* ---------- Generatoren ----------
+   Jede Funktion liefert ein Task-Objekt:
+   { type, question(html), answer, hints[], steps() } */
+
+/* 1) Zahlenreihe */
+function genSeq(){
+  const candidates = S.zr<=20?[1,2,5]
+    : S.zr<=100?[1,2,5,10,20,25]
+    : S.zr<=1000?[1,10,20,25,50,100,125]
+    : S.zr<=10000?[10,100,250,500,1000,2500]
+    : [100,250,500,1000,2500,5000,10000];
+  const step=pick(candidates);
+  const maxStart=S.zr-4*step;
+  if(maxStart<0) return genSeq();
+  const start=ri(Math.floor(maxStart/2), maxStart);
+  const dirUp=Math.random()<0.75;
+  const nums=[];
+  for(let i=0;i<5;i++) nums.push(start+(dirUp?1:-1)*i*step);
+  if(nums.some(n=>n<0)||nums[4]>S.zr) return genSeq();
+  const gapIdx=shuffled([1,2,3,4]).slice(0,2).sort((a,b)=>a-b);
+  const question=nums.map((n,i)=>gapIdx.includes(i)
+    ? '<input class="small" data-i="'+i+'" inputmode="numeric" placeholder="?" aria-label="Zahl">'
+    : '<span class="mathword">'+fmt(n)+'</span>').join('<span style="color:var(--soft)">,</span> ');
+  const answers=gapIdx.map(i=>nums[i]);
+  const stepTxt={de:`Die Schrittweite ist ${step}.`,ru:`Шаг равен ${step}.`,vi:`Bước nhảy là ${step}.`,ar:`خطوة العدّ ${step}.`}[S.lang];
+  return {type:'seq',question,answers,gapIdx,
+    hints:[stepTxt],
+    check(vals){return gapIdx.every((g,k)=>vals[k]===nums[g]);},
+    steps(){return [stepTxt+' → '+nums.join(' – ')];}};
+}
+
+/* 2) Zahlenstrahl */
+function genLine(){
+  const unit=S.zr<=20?1:S.zr<=100?10:S.zr<=1000?50:S.zr<=10000?500:50000;
+  const maxT=Math.floor(S.zr/unit);
+  const n=(ri(1,maxT-1))*unit+(unit>1?ri(Math.floor(unit/4),Math.floor(unit*0.75)):ri(1,Math.min(9,S.zr-1)));
+  if(n>S.zr) return genLine();
+  return {type:'line',n,unit,max:S.zr,
+    hints:[],
+    check(cv){return Math.abs(cv-n)<=Math.max(1,unit*0.2);},
+    steps(){const a=roundBelow(n,unit),b=a+unit;return [t('ex_line_hint',{n:fmt(n),a:fmt(a),b:fmt(b)})];}};
+}
+
+/* 3) Zahl erfassen */
+function genDots(){
+  let h=0,z=0,e=0;
+  if(S.zr<=20){z=1;e=ri(0,9);}
+  else if(S.zr<=100){z=ri(2,9);e=ri(0,9);}
+  else{h=ri(1,9);z=ri(0,9);e=ri(0,9);}
+  const n=h*100+z*10+e;
+  if(n>S.zr) return genDots();
+  const big=h>0?pw('h'):pw('z');
+  return {type:'dots',n,h,z,e,
+    hints:[t('ex_dots_hint',{big,small:h>0?pw('z'):pw('e')})],
+    check(v){return v===n;},
+    steps(){return [countText(h,z,e)];}};
+}
+
+/* 4) Stellenwerte (Multiple Choice) */
+function genPV(){
+  let n;
+  if(S.zr<=20)n=ri(10,20);else if(S.zr<=100)n=ri(21,99);else if(S.zr<=1000)n=ri(110,999);
+  else if(S.zr<=10000)n=ri(1100,9999);else n=ri(110000,999999);
+  const places=S.zr<=100?['z','e']:['h','z','e'];
+  const pl=pick(places);
+  const val=placeOf(n,pl);
+  const opts=shuffled([val,val+1,Math.max(0,val-1),val+10].filter((v,i,a)=>a.indexOf(v)===i)).slice(0,4);
+  if(!opts.includes(val))opts[0]=val;
+  const name=pl==='h'?pw('h'):pl==='z'?pw('z'):pw('e');
+  return {type:'choice',opts,val,
+    question:t('ex_pv_i',{n:fmt(n),place:name}),
+    hints:[countText(placeOf(n,'h'),placeOf(n,'z'),placeOf(n,'e'))],
+    check(v){return v===val;},
+    steps(){return [name+' = '+val];}};
+}
+
+/* 5) Bündeln und Entbündeln */
+function genBund(){
+  const useH=S.zr>=1000&&Math.random()<0.4;
+  const h=useH?ri(1,9):0;
+  const zMax=S.zr<=20?1:9;
+  const z=ri(1,zMax);
+  const e=ri(0,9);
+  const n=h*100+z*10+e;
+  if(n>S.zr) return genBund();
+  if(Math.random()<0.5){
+    const parts=[];
+    if(h>0)parts.push(h+' '+pw('h'));
+    parts.push(z+' '+pw('z'));
+    parts.push(e+' '+pw('e'));
+    const join=' + ';
+    const q={de:`Wie viele Einer sind: ${parts.join(join)} = ?`,
+             ru:`Сколько единиц: ${parts.join(join)} = ?`,
+             vi:`Bao nhiêu đơn vị: ${parts.join(join)} = ?`,
+             ar:`كم واحداً: ${parts.join(join)} = ؟`}[S.lang];
+    return {type:'input',answer:n,question:q,
+      hints:[countText(h,z,e)],check(v){return v===n;},
+      steps(){return [countText(h,z,e)];}};
+  }
+  let lo,hi;
+  if(S.zr<=20){lo=11;hi=20;}else if(S.zr<=100){lo=21;hi=99;}else{lo=110;hi=Math.min(999,S.zr);}
+  const nn=ri(lo,hi);
+  const zb=Math.floor(nn/10),eb=nn%10;
+  const q={de:`Tausche aus: ${fmt(nn)} ${pw('e')} = <input class="small" data-k="0" inputmode="numeric" placeholder="?"> ${pw('z')} + <input class="small" data-k="1" inputmode="numeric" placeholder="?"> ${pw('e')}`,
+           ru:`Разложи: ${fmt(nn)} ${pw('e')} = <input class="small" data-k="0" inputmode="numeric" placeholder="?"> ${pw('z')} + <input class="small" data-k="1" inputmode="numeric" placeholder="?"> ${pw('e')}`,
+           vi:`Tách ra: ${fmt(nn)} ${pw('e')} = <input class="small" data-k="0" inputmode="numeric" placeholder="?"> ${pw('z')} + <input class="small" data-k="1" inputmode="numeric" placeholder="?"> ${pw('e')}`,
+           ar:`فكّك: ${fmt(nn)} ${pw('e')} = <input class="small" data-k="0" inputmode="numeric" placeholder="?"> ${pw('z')} + <input class="small" data-k="1" inputmode="numeric" placeholder="?"> ${pw('e')}`}[S.lang];
+  return {type:'inputs',answers:[zb,eb],question:q,
+    hints:[countText(0,zb,eb)],
+    check(a){return a[0]===zb&&a[1]===eb;},
+    steps(){return [countText(0,zb,eb)];}};
+}
+
+/* 6) Rechengeschichte */
+function genStory(){
+  const op=pick(['+','-','*',':']);
+  let a,b,ans;
+  if(op==='+'){
+    a=ri(5,Math.max(6,Math.min(45,S.zr-4)));
+    b=ri(4,Math.max(5,Math.min(40,S.zr-a)));
+    ans=a+b;
+  } else if(op==='-'){
+    a=ri(12,Math.max(13,Math.min(60,S.zr)));
+    b=ri(3,Math.min(a-1,20));
+    ans=a-b;
+  } else if(op==='*'){
+    b=ri(2,6);
+    const hi=Math.max(3,Math.min(9,Math.floor(S.zr/b)));
+    a=ri(2,hi);
+    ans=a*b;
+  } else {
+    b=ri(2,6);
+    const q=ri(2,Math.max(3,Math.min(9,Math.floor(S.zr/b))));
+    ans=q;a=q*b;
+  }
+  if(ans>S.zr||a>S.zr) return genStory();
+  const tpl={'+':'story_plus','-':'story_minus','*':'story_mult',':':'story_div'}[op];
+  const text=t(tpl).split('{a}').join(fmt(a)).split('{b}').join(fmt(b));
+  const nums=(text.match(/\d[\d\u202f]*/g)||[]).map(x=>parseInt(x.replace(/\u202f/g,''),10));
+  const opNames={
+    de:{'+':'Addieren (+)','-':'Subtrahieren (−)','*':'Multiplizieren (×)',':':'Dividieren (:)'},
+    ru:{'+':'Сложение (+)','-':'Вычитание (−)','*':'Умножение (×)',':':'Деление (:)'},
+    vi:{'+':'Phép cộng (+)','-':'Phép trừ (−)','*':'Phép nhân (×)',':':'Phép chia (:)'},
+    ar:{'+':'الجمع (+)','-':'الطرح (−)','*':'الضرب (×)',':':'القسمة (:)'}}[S.lang];
+  const opHint={'+':'hint_plus','-':'hint_minus','*':'hint_mal',':':'hint_div'}[op];
+  const sym=op==='*'?'×':op==='-'?'−':op;
+  const expr=fmt(nums[0])+' '+sym+' '+fmt(nums[1])+' = '+fmt(ans);
+  return {type:'ops',op,text,nums,answer:ans,
+    hints:[t(opHint)],
+    checkOp(o){return o===op;},
+    check(v){return v===ans;},
+    steps(){return [opNames[op]+' → '+expr];}};
+}
+
+/* 7) Tausch-/Umkehraufgaben, gegensinniges Verändern */
+function genFam(){
+  const kind=pick(['tausch','umkehr','gegensinnig']);
+  let a2,b2;
+  if(S.zr<=20){a2=ri(6,12);b2=ri(3,9);if(a2+b2>S.zr)return genFam();}
+  else if(S.zr<=100){a2=ri(11,49);b2=ri(3,9);}
+  else if(S.zr<=1000){a2=ri(110,470);b2=ri(3,9);}
+  else{a2=ri(1100,4700);b2=ri(3,9);}
+  const c2=a2+b2;
+  if(kind==='tausch'){
+    return {type:'input',answer:a2,opHint:'hint_tausch',
+      question:`${fmt(a2)} + ${fmt(b2)} = ${fmt(c2)} &nbsp;→&nbsp; ${fmt(b2)} + ? = ${fmt(c2)}`,
+      check(v){return v===a2;},
+      steps(){return [`${fmt(b2)} + ${fmt(a2)} = ${fmt(c2)}`];}};
+  }
+  if(kind==='umkehr'){
+    return {type:'input',answer:a2,opHint:'hint_umkehr',
+      question:`${fmt(a2)} + ${fmt(b2)} = ${fmt(c2)} &nbsp;→&nbsp; ${fmt(c2)} − ${fmt(b2)} = ?`,
+      check(v){return v===a2;},
+      steps(){return [`${fmt(c2)} − ${fmt(b2)} = ${fmt(a2)}`];}};
+  }
+  const delta=pick([1,2]);
+  if(b2-delta<1) return genFam();
+  const a3=a2+delta,b3=b2-delta,ans=a3+b3;
+  return {type:'input',answer:ans,opHint:'hint_gegen',
+    question:`${fmt(a2)} + ${fmt(b2)} = ${fmt(c2)} &nbsp;→&nbsp; ${fmt(a3)} + ${fmt(b3)} = ?`,
+    check(v){return v===ans;},
+    steps(){return [`${fmt(a3)} + ${fmt(b3)} = ${fmt(ans)}`];}};
+}
+
+/* 8) Verdoppeln & Halbieren */
+function genDbl(){
+  const dbl=Math.random()<0.5;
+  let n;
+  if(S.zr<=20)n=ri(1,10);else if(S.zr<=100)n=ri(4,50);else if(S.zr<=1000)n=ri(20,500);else n=ri(50,5000);
+  n=2*Math.round(n/2);
+  if(dbl&&n*2>S.zr) return genDbl();
+  const ans=dbl?n*2:n/2;
+  const q=dbl
+    ? {de:`Verdopple: ${fmt(n)}`,ru:`Удвой: ${fmt(n)}`,vi:`Nhân đôi: ${fmt(n)}`,ar:`ضاعف: ${fmt(n)}`}[S.lang]
+    : {de:`Halbiere: ${fmt(n)}`,ru:`Раздели пополам: ${fmt(n)}`,vi:`Chia đôi: ${fmt(n)}`,ar:`نصّف: ${fmt(n)}`}[S.lang];
+  return {type:'input',answer:ans,question:q,
+    hints:[dbl?t('hint_dbl'):t('hint_half',{n:fmt(n)})],
+    check(v){return v===ans;},
+    steps(){return dbl?[`${fmt(n)} + ${fmt(n)} = ${fmt(ans)}`]:[`${fmt(n)} : 2 = ${fmt(ans)}`];}};
+}
+
+/* 9) Über die Zehner-/Hunderterzahl (Hilfsaufgabe) */
+function genTen(){
+  const u=tenUnit();
+  const sub=Math.random()<0.3;
+  let A,B;
+  if(u===10){
+    A=ri(11,S.zr<=20?19:79);
+    if(sub){const toR=A%10===0?ri(1,9):A%10;const extra=ri(1,9);B=toR+extra;if(A-B<0)return genTen();}
+    else{B=ri(2,9);if(Math.floor(A/10)===Math.floor((A+B)/10))return genTen();}
+  } else if(u===100){
+    A=ri(110,890);if(A%100<10||A%100>90)return genTen();
+    if(sub){const toR=A%100;const extra=ri(10,90);B=toR+extra;if(A-B<0)return genTen();}
+    else{B=ri(11,90);if(Math.floor(A/100)===Math.floor((A+B)/100))return genTen();}
+  } else if(u===1000){
+    A=ri(1100,8900);if(A%1000<100||A%1000>900)return genTen();
+    if(sub){const toR=A%1000;const extra=ri(100,900);B=toR+extra;if(A-B<0)return genTen();}
+    else{B=ri(110,900);if(Math.floor(A/1000)===Math.floor((A+B)/1000))return genTen();}
+  } else {
+    A=ri(11000,89000);if(A%10000<1000||A%10000>9000)return genTen();
+    if(sub){const toR=A%10000;const extra=ri(1000,9000);B=toR+extra;if(A-B<0)return genTen();}
+    else{B=ri(1100,9000);if(Math.floor(A/10000)===Math.floor((A+B)/10000))return genTen();}
+  }
+  const ans=A+(sub?-B:B);
+  if(ans<0||ans>S.zr) return genTen();
+  const q=`${fmt(A)} ${sub?'− '+fmt(B):'+ '+fmt(B)} = ?`;
+  const round=roundWord();
+  const ru=sub?roundBelow(A,u):nearestRoundAbove(A,u);
+  const toR=sub?A-ru:ru-A;
+  const rest=sub?ru-ans:ans-ru;
+  const hs=sub
+    ? {de:`Erst bis zur ${round}: ${fmt(A)} − ${fmt(toR)} = ${fmt(ru)}, dann noch ${fmt(rest)} weg.`,
+       ru:`Сначала до ${round}: ${fmt(A)} − ${fmt(toR)} = ${fmt(ru)}, потом ещё минус ${fmt(rest)}.`,
+       vi:`Trước hết tới ${round}: ${fmt(A)} − ${fmt(toR)} = ${fmt(ru)}, rồi bớt thêm ${fmt(rest)}.`,
+       ar:`أولاً إلى ${round}: ${fmt(A)} − ${fmt(toR)} = ${fmt(ru)}، ثم اطرح ${fmt(rest)}.`}[S.lang]
+    : {de:`Erst bis zur nächsten ${round}: ${fmt(A)} + ${fmt(toR)} = ${fmt(ru)}, dann ${fmt(rest)} dazu.`,
+       ru:`Сначала до ${round}: ${fmt(A)} + ${fmt(toR)} = ${fmt(ru)}, потом прибавь ${fmt(rest)}.`,
+       vi:`Trước hết tới ${round}: ${fmt(A)} + ${fmt(toR)} = ${fmt(ru)}, rồi cộng thêm ${fmt(rest)}.`,
+       ar:`أولاً إلى ${round}: ${fmt(A)} + ${fmt(toR)} = ${fmt(ru)}، ثم أضف ${fmt(rest)}.`}[S.lang];
+  return {type:'input',answer:ans,question:q,
+    hints:[hs],
+    check(v){return v===ans;},
+    steps(){const s1=`${fmt(A)} ${sub?'− '+fmt(toR):'+ '+fmt(toR)} = ${fmt(ru)}`;
+      const s2=`${fmt(ru)} ${sub?'− '+fmt(rest):'+ '+fmt(rest)} = ${fmt(ans)}`;
+      return [s1,s2];}};
+}
+
+/* 10) Rechpäckchen */
+function genPack(){
+  const type=pick(['plus','minus','mal']);
+  const b=ri(3,9);
+  if(S.zr<=20){
+    const a=ri(4,9);
+    const items=[];
+    for(let i=0;i<4;i++){
+      const A=a+i;
+      if(type==='minus'){const AA=A+b;if(AA>20)return genPack();items.push({q:`${AA} − ${b} = ?`,a:AA-b});}
+      else if(type==='mal'){const BB=ri(2,4);if(A*BB>20)return genPack();items.push({q:`${A} × ${BB} = ?`,a:A*BB});}
+      else{if(A+b>20)return genPack();items.push({q:`${A} + ${b} = ?`,a:A+b});}
+    }
+    return {type:'pack',items,
+      packHint:{de:'Die Aufgaben sind Nachbaraufgaben: Wenn 6 + 8 = 14 ist, dann ist 7 + 8 = 15 – nur um eins größer!',
+        ru:'Это соседние примеры: если 6 + 8 = 14, то 7 + 8 = 15 – на единицу больше!',
+        vi:'Đây là các bài liền kề: nếu 6 + 8 = 14 thì 7 + 8 = 15 – lớn hơn một!',
+        ar:'هذه مسائل مجاورة: إذا كان 6 + 8 = 14 فإن 7 + 8 = 15 – أكبر بواحد!'}[S.lang],
+      hints:[],checkIdx(v,i){return v===items[i].a;},
+      steps(){return items.map(it=>it.q.replace(' = ?',' = '+fmt(it.a)));}};
+  }
+  const step=S.zr<=100?10:S.zr<=1000?100:S.zr<=10000?1000:10000;
+  const zStart=ri(1,4);
+  const items=[];
+  for(let i=0;i<4;i++){
+    const z=zStart+i;
+    if(type==='plus'){const A=z*step;items.push({q:`${fmt(A)} + ${fmt(b)} = ?`,a:A+b});}
+    else if(type==='minus'){const A=z*step+b;items.push({q:`${fmt(A)} − ${fmt(b)} = ?`,a:A-b});}
+    else{const A=z*2;items.push({q:`${fmt(A)} × ${fmt(b)} = ?`,a:A*b});}
+  }
+  if(items[3].a>S.zr) return genPack();
+  return {type:'pack',items,
+    packHint:{de:'Die Einer bleiben gleich, nur die Zehner (Hunderter) verändern sich!',
+      ru:'Единицы одинаковые, меняются только десятки (сотни)!',
+      vi:'Hàng đơn vị giữ nguyên, chỉ hàng chục (trăm) thay đổi!',
+      ar:'الآحاد تبقى نفسها، تتغير العشرات (المئات) فقط!'}[S.lang],
+    hints:[],checkIdx(v,i){return v===items[i].a;},
+    steps(){return items.map(it=>it.q.replace(' = ?',' = '+fmt(it.a)));}};
+}
+
+/* 11) Worträtsel */
+function genWord(){
+  const word=pick(t('words'));
+  const letters=word.split('');
+  const ops=[];
+  const seen=new Set();
+  let guard=0;
+  while(ops.length<letters.length&&guard++<300){
+    const kind=pick(['+','-','x']);
+    let a,b,ans;
+    if(kind==='+'){a=ri(6,Math.max(8,Math.min(45,S.zr-4)));b=ri(4,Math.max(5,Math.min(20,S.zr-a)));ans=a+b;}
+    else if(kind==='-'){a=ri(12,Math.max(14,Math.min(60,S.zr)));b=ri(3,Math.min(a-1,15));ans=a-b;}
+    else{const hi=Math.max(3,Math.floor(Math.sqrt(S.zr)));a=ri(2,hi);b=ri(2,hi);ans=a*b;}
+    if(ans>S.zr||seen.has(ans))continue;
+    seen.add(ans);
+    ops.push({q:kind==='+'?`${a} + ${b} = ?`:kind==='-'?`${a} − ${b} = ?`:`${a} × ${b} = ?`,a:ans});
+  }
+  if(ops.length<letters.length) return genWord();
+  const distractors=t('words').filter(w=>w!==word).slice(0,2);
+  return {type:'word',word,letters,ops,options:shuffled([word,...distractors]),
+    hints:[],steps(){return [word];}};
+}
+
+/* ---------- Katalog ---------- */
+const CATALOG=[
+ {id:'cat1',ic:'🔢',topics:[
+   {id:'t_count',ex:[{id:'ex_seq',gen:genSeq},{id:'ex_line',gen:genLine}]},
+   {id:'t_repr',ex:[{id:'ex_dots',gen:genDots}]},
+   {id:'t_pv',ex:[{id:'ex_pv',gen:genPV},{id:'ex_bund',gen:genBund}]}]},
+ {id:'cat2',ic:'➕',topics:[
+   {id:'t_story',ex:[{id:'ex_story',gen:genStory}]},
+   {id:'t_fam',ex:[{id:'ex_fam',gen:genFam}]}]},
+ {id:'cat3',ic:'🐼',topics:[
+   {id:'t_strat',ex:[{id:'ex_dbl',gen:genDbl},{id:'ex_ten',gen:genTen}]},
+   {id:'t_auto',ex:[{id:'ex_pack',gen:genPack},{id:'ex_word',gen:genWord}]}]}
+];
+function findEx(id){for(const c of CATALOG)for(const tp of c.topics)for(const e of tp.ex)if(e.id===id)return{ex:e,topic:tp,cat:c};return null;}
+function catProgress(cat){let tot=0,got=0;for(const tp of cat.topics)for(const e of tp.ex){tot+=3;got+=((S.progress[e.id]||{}).stars)||0;}return tot?Math.round(got/tot*100):0;}
+function starStr(n){return '★'.repeat(n)+'☆'.repeat(3-n);}
+
+/* ---------- Ansichten ---------- */
+const app={innerHTML:''}; /* Platzhalter – wird im Browser an #app gebunden */
+
+function renderHome(){
+  S.view='home';
+  document.body.dir=S.lang==='ar'?'rtl':'ltr';
+  app.innerHTML=`
+    <div class="card">
+      <div class="pandarow">${pandaSVG('happy')}<div class="speech">${t('welcome')}</div></div>
+      <div class="sessionmeta">${t('zrLabel')}</div>
+      <div class="zrpicker">${ZR_KEYS.map(z=>`<button class="zrbtn ${z===S.zr?'sel':''}" data-zr="${z}">${NUM[S.lang][z]}</button>`).join('')}</div>
+    </div>
+    <div class="card">
+      <h3 style="margin:0">${t('chooseCat')}</h3>
+      <div class="homegrid">${CATALOG.map(c=>`
+        <button class="catcard" data-cat="${c.id}">
+          <span class="ic">${c.ic}</span>
+          <h3>${t(c.id)}</h3>
+          <p>${t(c.id+'d')}</p>
+          <div class="progress"><div style="width:${catProgress(c)}%"></div></div>
+        </button>`).join('')}</div>
+    </div>`;
+  app.querySelectorAll('.zrbtn').forEach(b=>b.onclick=()=>{S.zr=parseInt(b.dataset.zr,10);saveState();renderHome();});
+  app.querySelectorAll('.catcard').forEach(b=>b.onclick=()=>renderCat(b.dataset.cat));
+}
+
+function renderCat(catId){
+  const c=CATALOG.find(x=>x.id===catId);
+  app.innerHTML=`
+    <div class="navrow"><button class="btn" id="homeBtn">🏠 ${t('home')}</button></div>
+    <div class="card">
+      <h2 style="margin:0 0 4px">${c.ic} ${t(c.id)}</h2>
+      <p class="instr">${t(c.id+'d')}</p>
+      <div class="progress"><div style="width:${catProgress(c)}%"></div></div>
+      <div class="topics">${c.topics.map(tp=>`
+        <button class="topic" data-topic="${tp.id}" data-cat="${c.id}">
+          <h4>${t(tp.id)}</h4><p>${t(tp.id+'_d')}</p>
+        </button>`).join('')}</div>
+    </div>`;
+  document.getElementById('homeBtn').onclick=renderHome;
+  app.querySelectorAll('.topic').forEach(b=>b.onclick=()=>renderTopic(b.dataset.cat,b.dataset.topic));
+}
+
+function renderTopic(catId,topicId){
+  const c=CATALOG.find(x=>x.id===catId);
+  const tp=c.topics.find(x=>x.id===topicId);
+  app.innerHTML=`
+    <div class="navrow"><button class="btn" id="homeBtn">🏠 ${t('home')}</button><button class="btn" id="catBtn">← ${t(c.id)}</button></div>
+    <div class="card">
+      <h2 style="margin:0 0 4px">${t(tp.id)}</h2><p class="instr">${t(tp.id+'_d')}</p>
+      <div class="exlist">${tp.ex.map(e=>`
+        <button class="exitem" data-ex="${e.id}">
+          <div><div class="exname">${t(e.id)}</div><div class="exdesc">${t(e.id+'_d')}</div></div>
+          <div class="spacer"></div><div class="stars">${starStr(((S.progress[e.id]||{}).stars)||0)}</div>
+        </button>`).join('')}</div>
+    </div>`;
+  document.getElementById('homeBtn').onclick=renderHome;
+  document.getElementById('catBtn').onclick=()=>renderCat(catId);
+  app.querySelectorAll('.exitem').forEach(b=>b.onclick=()=>startSession(b.dataset.ex));
+}
+
+/* ---------- Session ---------- */
+let SES=null;
+function startSession(exId){
+  const found=findEx(exId);if(!found)return;
+  SES={exId,ex:found.ex,idx:0,firstTry:true,score:0,dots:[],task:null,wordLetters:[],packIdx:0,tries:0};
+  newTask();
+}
+function newTask(){
+  SES.task=SES.ex.gen();
+  if(SES.task.type==='pack'){SES.packIdx=0;SES.dots=[];}
+  if(SES.task.type==='word'){SES.wordLetters=[];}
+  SES.firstTry=true;SES.tries=0;
+  renderTask();
+}
+function maxTasks(){
+  const g=SES.task;
+  return g.type==='pack'?g.items.length:g.type==='word'?g.letters.length:8;
+}
+function curIdx(){
+  const g=SES.task;
+  return g.type==='pack'?SES.packIdx:g.type==='word'?SES.wordLetters.length:SES.idx;
+}
+
+function renderTask(){
+  const g=SES.task;
+  const n=maxTasks();
+  const meta=`<span>${t('task')} ${Math.min(curIdx()+1,n)} ${t('of')} ${n}</span>
+    <div class="dottrack">${Array.from({length:n},(_,i)=>`<span class="dot ${SES.dots[i]||''}"></span>`).join('')}</div>`;
+  let body='';
+  const exInstr={ex_seq:'ex_seq_i',ex_dots:'ex_dots_i',ex_fam:'ex_fam_i',ex_pack:'ex_pack_i',ex_word:'ex_word_i'};
+  if(g.type==='seq'){
+    body=`<div class="instr">${t('ex_seq_i')}</div><div class="qline" style="gap:6px">${g.question}</div>`;
+  } else if(g.type==='line'){
+    body=`<div class="instr">${t('ex_line_i',{n:fmt(g.n)})}</div>${renderNumberLine(g)}`;
+  } else if(g.type==='dots'){
+    body=`<div class="instr">${t('ex_dots_i')}</div>${renderDots(g)}<div class="qline">= <input id="ansIn" inputmode="numeric" placeholder="?" aria-label="Antwort"></div>`;
+  } else if(g.type==='choice'){
+    body=`<div class="instr">${g.question}</div><div class="choices">${g.opts.map(o=>`<button class="choice" data-v="${o}">${o}</button>`).join('')}</div>`;
+  } else if(g.type==='input'){
+    const instr=exInstr[SES.exId]?`<div class="instr">${t(exInstr[SES.exId])}</div>`:'';
+    body=`${instr}<div class="qline">${g.question.replace(' = ?',' = ')}<input id="ansIn" inputmode="numeric" placeholder="?" aria-label="Antwort"></div>`;
+  } else if(g.type==='inputs'){
+    body=`<div class="qline">${g.question}</div>`;
+  } else if(g.type==='ops'){
+    body=`<div class="speech" style="margin-bottom:12px">📖 ${g.text}</div>
+      <div class="instr">${t('sel_op')}</div>
+      <div class="choices ops">
+        <button class="choice" data-op="+">+</button><button class="choice" data-op="-">−</button>
+        <button class="choice" data-op="*">×</button><button class="choice" data-op=":">:</button>
+      </div>`;
+  } else if(g.type==='pack'){
+    body=`<div class="instr">${t('ex_pack_i')}</div>
+      <div style="background:var(--blue-soft);border-radius:10px;padding:10px 12px;margin-bottom:10px;direction:ltr;font-size:1.1rem">
+      ${g.items.map((x,i)=>`<div style="${i<SES.packIdx?'color:var(--green);font-weight:bold':i===SES.packIdx?'font-weight:bold':'opacity:.45'}">${x.q}</div>`).join('')}
+      </div>
+      <div class="qline"><input id="ansIn" inputmode="numeric" placeholder="?" aria-label="Antwort"></div>`;
+  } else if(g.type==='word'){
+    body=`<div class="instr">${t('ex_word_i')}</div>
+      <div class="qline">${g.ops[SES.wordLetters.length].q.replace(' = ?',' = ')}<input id="ansIn" inputmode="numeric" placeholder="?" aria-label="Antwort"></div>
+      <div class="hearts">${SES.wordLetters.map(l=>`<span class="mathword">${l}</span>`).join('')}</div>`;
+  }
+  const showCheck=['seq','input','inputs','dots','pack','word'].includes(g.type);
+  app.innerHTML=`
+    <div class="navrow"><button class="btn" id="homeBtn">🏠 ${t('home')}</button>
+      <button class="btn" id="backBtn">← ${t('back')}</button><div class="spacer"></div><span class="sessionmeta">${meta}</span></div>
+    <div class="card taskcard">
+      <div class="pandarow">${pandaSVG('happy')}<div class="speech" id="pandaSay">${t(SES.exId+'_d')}</div></div>
+      <h2>${t(SES.exId)}</h2>
+      ${body}
+      <div class="feedback" id="fb"></div>
+      <div class="navrow">
+        ${showCheck?`<button class="btn primary" id="checkBtn">${t('check')}</button>`:''}
+        <div class="spacer"></div>
+        <span class="sessionmeta">${t('points')}: <b id="scoreLbl">${SES.score}</b></span>
+      </div>
+    </div>`;
+  wireTask();
+}
+
+/* --- Spezial-Renderer --- */
+function renderNumberLine(g){
+  const w=Math.min(760,Math.max(320,window.innerWidth-60));
+  const pad=26,y=70;
+  const x=v=>pad+(v/g.max)*(w-2*pad);
+  let ticks='';
+  for(let v=0;v<=g.max;v+=g.unit){
+    ticks+=`<line x1="${x(v)}" y1="${y-8}" x2="${x(v)}" y2="${y+8}" stroke="#5a6b60" stroke-width="2"/>
+      <text x="${x(v)}" y="${y+30}" font-size="14" text-anchor="middle" fill="#2b2b2b">${fmt(v)}</text>`;
+  }
+  return `<div style="overflow-x:auto"><svg id="lineSvg" width="${w}" height="130" style="direction:ltr;max-width:100%">
+    <line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#2b2b2b" stroke-width="3"/>${ticks}</svg></div>`;
+}
+function renderDots(g){
+  let x=10,y=30,svg='';
+  for(let i=0;i<g.h;i++){
+    svg+=`<rect x="${x}" y="${y-20}" width="60" height="60" fill="#e3efe3" stroke="#5c8a5c" stroke-width="2" rx="6"/>
+      <text x="${x+30}" y="${y+18}" text-anchor="middle" font-size="11" fill="#5c8a5c">100</text>`;
+    x+=70;if((i+1)%5===0){x=10;y+=74;}
+  }
+  for(let i=0;i<g.z;i++){
+    svg+=`<rect x="${x}" y="${y-16}" width="24" height="52" fill="#fff" stroke="#37413a" stroke-width="2" rx="5"/>
+      <text x="${x+12}" y="${y+16}" text-anchor="middle" font-size="10">10</text>`;
+    x+=30;if((i+1)%8===0){x=10;y+=60;}
+  }
+  for(let i=0;i<g.e;i++){
+    svg+=`<circle cx="${x+(i%5)*13}" cy="${y+Math.floor(i/5)*13}" r="5.5" fill="#e8a13c"/>`;
+  }
+  const hgt=y+(Math.floor(g.e/5)+1)*14+20;
+  return `<div style="overflow-x:auto"><svg width="640" height="${hgt}" style="direction:ltr;max-width:100%">${svg}</svg></div>`;
+}
+
+/* --- Verdrahtung --- */
+function wireTask(){
+  const g=SES.task;
+  document.getElementById('homeBtn').onclick=renderHome;
+  document.getElementById('backBtn').onclick=()=>{const f=findEx(SES.exId);renderTopic(f.cat.id,f.topic.id);};
+  const inp=document.getElementById('ansIn');
+  if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitInput();});}
+  const checkBtn=document.getElementById('checkBtn');
+  if(checkBtn)checkBtn.onclick=submitInput;
+  if(g.type==='choice'){
+    app.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+      const v=parseInt(b.dataset.v,10);
+      app.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
+      if(g.check(v))success(b);else fail(b);
+    });
+  }
+  if(g.type==='line'){
+    const svg=document.getElementById('lineSvg');
+    svg.addEventListener('click',ev=>{
+      const rect=svg.getBoundingClientRect();
+      const pad=26,w=svg.width.baseVal.value;
+      const scale=w/rect.width;
+      const vx=Math.round(((ev.clientX-rect.left)*scale-pad)/(w-2*pad)*g.max);
+      if(g.check(vx))success(null);else fail(null);
+    });
+  }
+  if(g.type==='ops'){
+    app.querySelectorAll('[data-op]').forEach(b=>b.onclick=()=>{
+      const o=b.dataset.op;
+      if(g.checkOp(o)){b.classList.add('sel');renderOpsSecond();}
+      else fail(b,true);
+    });
+  }
+}
+function renderOpsSecond(){
+  const g=SES.task;
+  const opsEl=document.querySelector('.choices.ops');
+  if(opsEl){
+    const sym=g.op==='*'?'×':g.op==='-'?'−':g.op;
+    opsEl.outerHTML=`<div class="qline">${fmt(g.nums[0])} ${sym} ${fmt(g.nums[1])} = <input id="ansIn" inputmode="numeric" placeholder="?" aria-label="Antwort"></div>`;
+  }
+  const btnRow=document.querySelector('.taskcard .navrow:last-child');
+  if(!document.getElementById('checkBtn')){
+    const b=document.createElement('button');
+    b.className='btn primary';b.id='checkBtn';b.textContent=t('check');
+    btnRow.prepend(b);
+  }
+  document.getElementById('checkBtn').onclick=submitInput;
+  const inp=document.getElementById('ansIn');
+  if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')submitInput();});}
+}
+function submitInput(){
+  const g=SES.task;
+  if(g.type==='seq'){
+    const vals=[...app.querySelectorAll('.qline input')].map(i=>parseInt(i.value,10));
+    if(vals.some(isNaN))return;
+    if(g.check(vals))success();else fail(null);
+    return;
+  }
+  if(g.type==='inputs'){
+    const ins=[...app.querySelectorAll('.qline input')].map(i=>parseInt(i.value,10));
+    if(ins.some(isNaN))return;
+    if(g.check(ins))success();else fail(null);
+    return;
+  }
+  const inp=document.getElementById('ansIn');
+  if(!inp)return;
+  const v=parseInt((inp.value||'').replace(/\u202f/g,''),10);
+  if(isNaN(v))return;
+  if(g.type==='word'){
+    const cur=g.ops[SES.wordLetters.length];
+    if(v===cur.a){
+      SES.wordLetters.push(g.letters[SES.wordLetters.length]);
+      SES.score++;updateScore();
+      SES.dots[SES.wordLetters.length-1]='ok';
+      if(SES.wordLetters.length>=g.letters.length)renderWordPick();
+      else renderTask();
+    } else {
+      SES.tries++;
+      if(SES.tries===1){showErr((g.hints||[]),t('wrong'));}
+      else{showErr([cur.q.replace(' = ?',' = '+fmt(cur.a))],t('wrong2'));SES.tries=0;}
+    }
+    return;
+  }
+  if(g.type==='pack'){
+    const i=SES.packIdx,it=g.items[i];
+    if(v===it.a){
+      SES.score++;SES.dots[i]='ok';SES.packIdx++;updateScore();
+      if(SES.packIdx>=g.items.length)endRound();else renderTask();
+    } else {
+      SES.tries++;
+      if(SES.tries===1){showErr([SES.task.packHint],t('wrong'));}
+      else{showErr([it.q.replace(' = ?',' = '+fmt(it.a))],t('wrong2'));SES.tries=0;}
+    }
+    return;
+  }
+  if(g.check(v))success();else fail(null);
+}
+function showErr(list,head){
+  const fb=document.getElementById('fb');
+  fb.className='feedback err';
+  fb.innerHTML=`${head} <ul class="steps">${list.filter(Boolean).map(h=>`<li>${h}</li>`).join('')}</ul>`;
+  const row=document.querySelector('.pandarow');
+  const old=row.querySelector('svg');if(old)old.remove();
+  row.insertAdjacentHTML('afterbegin',pandaSVG('sad'));
+}
+function updateScore(){const el=document.getElementById('scoreLbl');if(el)el.textContent=SES.score;}
+function success(el){
+  const fb=document.getElementById('fb');
+  fb.className='feedback ok';
+  fb.innerHTML='🐼 '+pick(t('correct'));
+  const row=document.querySelector('.pandarow');
+  const old=row.querySelector('svg');if(old)old.remove();
+  row.insertAdjacentHTML('afterbegin',pandaSVG('happy'));
+  if(el)el.classList.add('sel');
+  SES.score+=SES.firstTry?2:1;
+  updateScore();
+  SES.dots[curIdx()]=SES.firstTry?'ok':'half';
+  SES.idx++;
+  setTimeout(()=>{
+    if(SES.idx>=maxTasks())endRound();
+    else newTask();
+  },900);
+}
+function fail(el,noAdvance){
+  const g=SES.task;
+  SES.firstTry=false;
+  if(el)el.classList.remove('sel');
+  SES.tries++;
+  if(SES.tries===1){
+    let hs=(g.hints||[]).slice();
+    if(!hs.length&&g.opHint)hs=[t(g.opHint)];
+    showErr(hs,t('wrong'));
+  } else {
+    showErr((g.steps?g.steps():[]),t('wrong2')+' <b>'+t('sol')+'</b>');
+    SES.tries=0;
+    if(!noAdvance){
+      SES.dots[curIdx()]=SES.dots[curIdx()]||'bad';
+      SES.idx++;
+      setTimeout(()=>{
+        if(SES.idx>=maxTasks())endRound();
+        else newTask();
+      },1700);
+    }
+  }
+}
+function renderWordPick(){
+  const g=SES.task;
+  app.innerHTML=`
+   <div class="navrow"><button class="btn" id="homeBtn">🏠 ${t('home')}</button></div>
+   <div class="card taskcard roundend">
+     <div class="pandarow">${pandaSVG('happy')}<div class="speech">${t('ex_word_pick')}</div></div>
+     <div class="hearts">${g.letters.map(l=>`<span class="mathword">${l}</span>`).join('')}</div>
+     <div class="choices" style="justify-content:center;margin-top:16px">
+       ${g.options.map(o=>`<button class="choice" data-w="${o}">${o}</button>`).join('')}
+     </div>
+     <div class="feedback" id="fb"></div>
+   </div>`;
+  document.getElementById('homeBtn').onclick=renderHome;
+  app.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{
+    const fb=document.getElementById('fb');
+    if(b.dataset.w===g.word){
+      fb.className='feedback ok';fb.innerHTML='🎉 '+pick(t('correct'));
+      SES.score+=2;
+      setTimeout(endRound,1100);
+    } else {
+      fb.className='feedback err';
+      fb.innerHTML=`${t('wrong2')} <b>${t('sol')}</b><ul class="steps"><li>${g.word}</li></ul>`;
+      setTimeout(endRound,1800);
+    }
+  });
+}
+function endRound(){
+  const n=maxTasks();
+  const type=SES.task.type;
+  const maxPts=type==='pack'?SES.task.items.length*2
+    :type==='word'?SES.task.letters.length+2
+    :n*2;
+  const pct=Math.min(100,Math.round(SES.score/maxPts*100));
+  const stars=pct>=90?3:pct>=60?2:pct>=35?1:0;
+  const p=S.progress[SES.exId]||(S.progress[SES.exId]={stars:0});
+  p.stars=Math.max(p.stars||0,stars);
+  saveState();
+  app.innerHTML=`
+   <div class="navrow"><button class="btn" id="homeBtn">🏠 ${t('home')}</button></div>
+   <div class="card taskcard roundend">
+     <div class="pandarow" style="justify-content:center">${pandaSVG('happy')}<div class="speech">${t('finished')}</div></div>
+     <div class="bigstars">${starStr(stars)}</div>
+     <div class="progress" style="max-width:320px;margin:10px auto"><div style="width:${pct}%"></div></div>
+     <p class="sessionmeta">${t('points')}: <b>${SES.score}</b> / ${maxPts}</p>
+     <div class="navrow" style="justify-content:center">
+       <button class="btn primary big" id="againBtn">🔄 ${t('retry')}</button>
+     </div>
+   </div>`;
+  document.getElementById('homeBtn').onclick=renderHome;
+  document.getElementById('againBtn').onclick=()=>startSession(SES.exId);
+}
+
+/* ---------- Kopfzeile / Sprache (nur im Browser) ---------- */
+if(typeof document!=='undefined'&&document.getElementById&&document.getElementById('langbar')){
+  const langbar=document.getElementById('langbar');
+  const realApp=document.getElementById('app');
+  /* app-Platzhalter an das echte DOM-Element binden */
+  app.querySelectorAll=(sel)=>realApp.querySelectorAll(sel);
+  Object.defineProperty(app,'innerHTML',{get(){return realApp.innerHTML;},set(v){realApp.innerHTML=v;}});
+  function renderLangbar(){
+    langbar.innerHTML=LANGS.map(([c,n])=>`<button class="langbtn" aria-pressed="${S.lang===c}" data-l="${c}">${n}</button>`).join('');
+    langbar.querySelectorAll('.langbtn').forEach(b=>b.onclick=()=>{
+      S.lang=b.dataset.l;saveState();renderLangbar();renderChrome();
+      if(SES){const f=findEx(SES.exId);renderTopic(f.cat.id,f.topic.id);}else renderHome();
+    });
+  }
+  function renderChrome(){
+    document.documentElement.lang=S.lang;
+    document.body.dir=S.lang==='ar'?'rtl':'ltr';
+    document.getElementById('pandaTop').innerHTML=pandaSVG('happy');
+    document.getElementById('footer').textContent=t('credits');
+  }
+  renderLangbar();renderChrome();renderHome();
+}
+
+/* ---------- Selbsttest (Node) ---------- */
+if(typeof module!=='undefined'&&typeof document==='undefined'){
+  const assert=(cond,msg)=>{if(!cond){console.error('FAIL:',msg);process.exitCode=1;}};
+  const ZRS=[20,100,1000,10000,1000000];
+  const LANGS2=['de','vi','ru','ar'];
+  let total=0;
+  for(const lang of LANGS2){
+    S.lang=lang;
+    for(const zr of ZRS){
+      S.zr=zr;
+      for(let i=0;i<300;i++){
+        total++;
+        const seq=genSeq();
+        const m=seq.question.match(/data-i="(\d)"/g);
+        assert(m&&m.length===2,'seq: 2 Lücken ('+lang+'/'+zr+')');
+        assert(seq.answers.every(a=>a>=0&&a<=zr),'seq: Wert im ZR ('+seq.answers.join(',')+' /'+zr+')');
+        const line=genLine();
+        assert(line.n>=0&&line.n<=zr,'line: n im ZR');
+        assert(line.check(line.n),'line: eigene Position ist korrekt');
+        const dots=genDots();
+        assert(dots.check(dots.n),'dots: n ist korrekte Antwort');
+        assert(dots.h*100+dots.z*10+dots.e===dots.n,'dots: H/Z/E ergeben n');
+        const pv=genPV();
+        assert(pv.opts.includes(pv.val),'pv: richtige Option enthalten');
+        assert(pv.check(pv.val),'pv: check(val) true');
+        assert(pv.opts.every(o=>o>=0),'pv: Optionen >=0');
+        const bund=genBund();
+        if(bund.type==='input'){assert(bund.check(bund.answer),'bund: check(answer)');assert(bund.answer<=zr,'bund: im ZR');}
+        else{assert(bund.check(bund.answers),'bund: check(answers)');assert(bund.answers[0]*10+bund.answers[1]<=Math.max(20,zr),'bund: zerlegt im ZR');}
+        const story=genStory();
+        assert(story.check(story.answer),'story: check(answer)');
+        assert(story.nums.length>=2,'story: 2 Zahlen im Text');
+        assert(story.nums[0]>=0&&story.nums[1]>=0,'story: positive Zahlen');
+        assert(story.answer<=zr,'story: Ergebnis im ZR');
+        for(const o of ['+','-','*',':'])assert(story.checkOp(o)===(o===story.op),'story: checkOp');
+        const fam=genFam();
+        assert(fam.check(fam.answer),'fam: check(answer)');
+        assert(fam.answer<=zr,'fam: im ZR');
+        const dbl=genDbl();
+        assert(dbl.check(dbl.answer),'dbl: check(answer)');
+        assert(dbl.answer<=zr,'dbl: im ZR');
+        const ten=genTen();
+        assert(ten.check(ten.answer),'ten: check(answer)');
+        assert(ten.answer>=0&&ten.answer<=zr,'ten: im ZR ('+ten.question+' = '+ten.answer+')');
+        const steps=ten.steps();
+        const nums1=(steps[0].match(/\d[\d\u202f]*/g)||[]).map(x=>parseInt(x.replace(/\u202f/g,''),10));
+        const nums2=(steps[1].match(/\d[\d\u202f]*/g)||[]).map(x=>parseInt(x.replace(/\u202f/g,''),10));
+        assert(nums1[2]===nums2[0],'ten: Rundzahl konsistent ('+steps.join(' | ')+')');
+        assert(nums2[2]===ten.answer,'ten: Endsumme = Antwort ('+steps.join(' | ')+' vs '+ten.answer+')');
+        const pack=genPack();
+        assert(pack.items.length===4,'pack: 4 Aufgaben');
+        assert(pack.items.every(it=>it.a>=0&&it.a<=zr),'pack: Ergebnisse im ZR ('+pack.items.map(i=>i.a).join(',')+' /'+zr+')');
+        pack.items.forEach((it,i)=>assert(pack.checkIdx(it.a,i),'pack: checkIdx'));
+        const word=genWord();
+        assert(word.letters.length===word.ops.length,'word: Buchstaben = Aufgaben');
+        assert(word.options.includes(word.word),'word: Lösung in Optionen');
+        assert(word.ops.every(o=>o.a<=zr),'word: Ergebnisse im ZR');
+        word.ops.forEach((o,i)=>assert(!word.ops.slice(0,i).some(p=>p.a===o.a),'word: keine doppelten Antworten'));
+      }
+    }
+  }
+  /* Übersetzungsschlüssel-Vollständigkeit */
+  const deKeys=Object.keys(T.de);
+  for(const lang of ['vi','ru','ar']){
+    for(const k of deKeys){
+      if(!(k in T[lang])){console.error('FAIL: fehlender Schlüssel '+k+' in '+lang);process.exitCode=1;}
+    }
+  }
+  for(const lang of LANGS2)for(const k of deKeys){
+    const v=T[lang][k];
+    if(typeof v==='string'&&/\{[a-z0-9]+\}/.test(v)){
+      const deV=T.de[k];const deP=(deV.match(/\{[a-z0-9]+\}/g)||[]).sort().join();
+      const p=(v.match(/\{[a-z0-9]+\}/g)||[]).sort().join();
+      if(deP!==p){console.error('FAIL: Platzhalter weichen ab: '+k+' ('+lang+') '+p+' vs '+deP);process.exitCode=1;}
+    }
+  }
+  console.log('Geprüfte Aufgaben-Runden:',total,'(je 11 Aufgabentypen in 4 Sprachen und 5 Zahlenräumen)');
+  console.log(process.exitCode?'TESTS FEHLGESCHLAGEN':'ALLE TESTS BESTANDEN');
+}
+</script>
+</body>
+</html>
